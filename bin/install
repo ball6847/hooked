@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [[ "`which virtualenv`" == "" ]]; then
+    echo "virtualenv not found"
+    exit 1
+fi
+
+if [[ "`which supervisorctl`" == "" ]]; then
+    echo "supervisorctl not found"
+    exit 1
+fi
+
+#################################
+# start
+
+cd `dirname $0`/..
+
+# install application library
+if [[ ! -d "$PWD/.venv" ]]; then
+    virtualenv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    deactivate
+fi
+
+# install service, supervisord is required
+echo "Please enter your password to install hooked as supervisord service"
+
+CONF="[program:hooked]\ncommand=$PWD/bin/run\nuser=`whoami`"
+
+sudo sh -c "echo \"$CONF\" > /etc/supervisor/conf.d/hooked.conf"
+
+echo "Invoke supervisord"
+
+sudo sh -c "supervisorctl reread && supervisorctl add hooked"
+
+echo "Done"
