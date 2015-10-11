@@ -2,4 +2,16 @@
 
 cd `dirname $0`/..
 source .venv/bin/activate
-exec hooked hooked.cfg
+
+CFGF=$PWD/tmp.cfg
+
+echo "" > $CFGF
+
+for f in conf.d/*.cfg; do
+    cat $f >> $CFGF
+done
+
+# cleanup
+trap "rm -f $CFGF" TERM
+
+exec hooked $CFGF
