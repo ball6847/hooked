@@ -2,4 +2,4 @@
 
 cd `dirname $0`/..
 source .venv/bin/activate
-hooked hooked.cfg
+exec hooked hooked.cfg
